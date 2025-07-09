@@ -14,8 +14,12 @@ struct ContentView: View {
     @State private var correctChoice = ""
     @State private var scoreTitle = ""
     
+    @State private var point = 0
+    @State private var routeNum = 0
+    
     @State private var showingScore = false
     @State private var gameStarted = false
+    @State private var gameEnded = false
     
     let choices = ["Rock", "Paper", "Scissors"]
     let beats : [String: String] = [
@@ -32,44 +36,88 @@ struct ContentView: View {
                     gameStarted = true
                 } label: {
                     Text("Start")
+                        .font(.largeTitle)
                 }
             }
             
-            HStack(spacing: 20) {
-                Text(randomPick)
-                Text(randomResult)
-            }
+//            HStack(spacing: 20) {
+//                Text(randomPick)
+//                Text(randomResult)
+//            }
+//            .font(.title)
             
 //            Text(correctChoice)
             
             
             VStack(spacing: 20) {
-                ForEach(choices, id: \.self) { choice in
-                    Button {
-                        checkChoice(choose: choice)
-                    } label: {
-                        Text(choice)
-                            .font(.title2)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue.opacity(0.8))
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
+                if gameStarted {
+                    Text("Route \(routeNum)")
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundColor(.black)
+                    
+                    Spacer()
+                    Spacer()
+                    
+                    HStack(spacing: 20) {
+                        Text(randomPick)
+                            .padding(.trailing, 25)
+                        Text(randomResult)
+                            .padding(.leading, 25)
                     }
+                    .font(.title.bold())
+                    Spacer()
+                    ForEach(choices, id: \.self) { choice in
+                        Button {
+                            checkChoice(choose: choice)
+                        } label: {
+                            Text(choice)
+                                .font(.title2.bold())
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.blue.opacity(0.8))
+                                .foregroundColor(.white)
+                                .clipShape(Capsule())
+                            
+                        }
+                    }
+                    
+                    Spacer()
+                    Spacer()
+                    
+                    Text("\(point) points")
+                        .foregroundStyle(.black)
+                        .font(.title.bold())
                 }
             }
         }
         .alert(scoreTitle, isPresented: $showingScore) {
             Button("continue", action: generateRoute)
         } message: {
-            Text("your choice is" + scoreTitle)
+            Text("Your choice is \(scoreTitle)\nYou have \(point) point")
+        }
+        .alert("Game End!", isPresented: $gameEnded) {
+            Button("NEW GAME", action: newGame)
+        } message: {
+            Text("Your total point is \(point)")
         }
     }
     
     func generateRoute() {
-        randomPick = choices.randomElement()!
-        randomResult = Bool.random() ? "Win" : "Lose"
-        correctChoice = correctAnswer(state: randomResult, opponent: randomPick)
+        if routeNum < 10 {
+            randomPick = choices.randomElement()!
+            randomResult = Bool.random() ? "Win" : "Lose"
+            correctChoice = correctAnswer(state: randomResult, opponent: randomPick)
+            routeNum += 1
+        } else {
+            gameEnded = true
+        }
+    }
+    
+    func newGame() {
+        gameStarted = false
+        gameEnded = false
+        point = 0
+        routeNum = 1
     }
     
     func correctAnswer(state: String, opponent: String) -> String {
@@ -90,6 +138,7 @@ struct ContentView: View {
     func checkChoice(choose choice: String) {
         if choice == correctChoice {
             scoreTitle = "Correct!"
+            point += 1
         } else {
             scoreTitle = "Wrong :("
         }
