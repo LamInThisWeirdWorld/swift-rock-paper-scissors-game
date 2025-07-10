@@ -21,11 +21,11 @@ struct ContentView: View {
     @State private var gameStarted = false
     @State private var gameEnded = false
     
-    let choices = ["Rock", "Paper", "Scissors"]
+    let choices = ["👊Rock👊", "🖐️Paper🖐️", "✌️Scissors✌️"]
     let beats : [String: String] = [
-        "Rock": "Scissors",
-        "Paper": "Rock",
-        "Scissors": "Paper"
+        "👊Rock👊": "✌️Scissors✌️",
+        "🖐️Paper🖐️": "👊Rock👊",
+        "✌️Scissors✌️": "🖐️Paper🖐️"
     ]
     
     var body: some View {
@@ -63,6 +63,7 @@ struct ContentView: View {
                             .padding(.trailing, 25)
                         Text(randomResult)
                             .padding(.leading, 25)
+                            .foregroundColor(randomResult == "Win" ? .green : .red)
                     }
                     .font(.title.bold())
                     Spacer()
@@ -71,7 +72,7 @@ struct ContentView: View {
                             checkChoice(choose: choice)
                         } label: {
                             Text(choice)
-                                .font(.title2.bold())
+                                .font(.system(size: 40))
                                 .padding()
                                 .frame(maxWidth: .infinity)
                                 .background(Color.blue.opacity(0.8))
